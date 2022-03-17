@@ -1,8 +1,9 @@
-use std::{error::Error, fs};
+use std::{error::Error, fs, env};
 
 pub struct Config {
     haystack: String,
     file: String,
+    case_sensitive: bool,
 }
 
 impl Config {
@@ -14,6 +15,7 @@ impl Config {
         Ok(Config {
             haystack: args[1].to_owned(),
             file: args[2].to_owned(),
+            case_sensitive: env::var("CASE_SENSITIVE").is_err(),
         })
     }
 }
@@ -21,8 +23,14 @@ impl Config {
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file)?;
 
-    for line in search(&config.haystack, &contents) {
-        println!("{}", line);
+    if true == config.case_sensitive {
+        for line in search(&config.haystack, &contents) {
+            println!("{}", line);
+        }
+    } else {
+        for line in search_insensitive(&config.haystack, &contents) {
+            println!("{}", line);
+        }
     }
 
     Ok(())
