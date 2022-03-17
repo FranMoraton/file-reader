@@ -23,14 +23,14 @@ impl Config {
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file)?;
 
-    if true == config.case_sensitive {
-        for line in search(&config.haystack, &contents) {
-            println!("{}", line);
-        }
+    let results = if config.case_sensitive {
+        search(&config.haystack, &contents)
     } else {
-        for line in search_insensitive(&config.haystack, &contents) {
-            println!("{}", line);
-        }
+        search_insensitive(&config.haystack, &contents)
+    };
+
+    for line in results {
+        println!("{}", line);
     }
 
     Ok(())
