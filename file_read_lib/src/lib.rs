@@ -15,7 +15,10 @@ impl Config {
         Ok(Config {
             haystack: args[1].to_owned(),
             file: args[2].to_owned(),
-            case_sensitive: env::var("CASE_SENSITIVE").is_err(),
+            case_sensitive: match env::var("CASE_SENSITIVE") {
+                Ok(n) => n.parse().unwrap(),
+                Err(_) => false,
+            },
         })
     }
 }
