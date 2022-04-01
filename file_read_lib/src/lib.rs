@@ -7,18 +7,28 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("not enough parameters expect haystack and file");
-        }
+    pub fn new(mut args: env::Args) -> Result<Config, &'static str> {
+        args.next();
+
+        let haystack = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a haystack string"),
+        };
+
+        let file = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a file name"),
+        };
+        
+        let case_sensitive= match env::var("CASE_SENSITIVE") {
+            Ok(n) => n.parse().unwrap(),
+            Err(_) => false,
+        };
 
         Ok(Config {
-            haystack: args[1].to_owned(),
-            file: args[2].to_owned(),
-            case_sensitive: match env::var("CASE_SENSITIVE") {
-                Ok(n) => n.parse().unwrap(),
-                Err(_) => false,
-            },
+            haystack,
+            file,
+            case_sensitive,
         })
     }
 }
